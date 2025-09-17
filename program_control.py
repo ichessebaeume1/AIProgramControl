@@ -3,15 +3,19 @@ from pydantic import BaseModel, Field
 import json
 import subprocess
 
-task = input("Command: ")
-
+# defining openAi client
 client = OpenAI(
     api_key="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",
 )
 
+# setting up pydantic model for application extraction
 class ApplicationName(BaseModel):
     a: list[str] = Field(..., description='The names of the applications mentioned by the user which he wants to open.')
 
+
+task = input("Command: ")
+
+# send task to api and format response into list
 messages = [
     {
         'role': 'user',
@@ -26,8 +30,9 @@ response = client.chat.completions.parse(
     timeout=10
 )
 
-apps = json.loads(response.choices[0].message.content)['a']   # {'a': ['explorer']}
+apps = json.loads(response.choices[0].message.content)['a']
 
+# try to open every app in the given list
 for app in apps:
     print(f"Trying to open {app.lower()}...")
     command = f"start {app.lower()}"
